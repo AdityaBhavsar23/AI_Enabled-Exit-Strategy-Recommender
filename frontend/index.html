@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Exit Strategy | Ocean Breeze</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart Library -->
+    <script src="https://cdn.plot.ly/plotly-2.27.1.min.js"></script>
+    
+    <style>
+        /* ========== OCEAN BREEZE THEME ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #d4e6f1 0%, #a9c9e0 100%);
+            padding: 24px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        /* ===== HEADER ===== */
+        .header {
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 28px;
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+        }
+        
+        .header h1 {
+            color: #1a4b6d;
+            font-size: 28px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: -0.5px;
+        }
+        
+        .header h1 i {
+            color: #2c7da0;
+            font-size: 32px;
+        }
+        
+        .header p {
+            color: #2c7da0;
+            font-size: 15px;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+        
+        /* ===== STATS CARDS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+        
+        .stat-card {
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 22px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border: 1px solid rgba(255,255,255,0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgba(44,125,160,0.2);
+            background: rgba(255,255,255,0.95);
+        }
+        
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            background: rgba(44,125,160,0.1);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2c7da0;
+            font-size: 24px;
+        }
+        
+        .stat-info h3 {
+            color: #1a4b6d;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .stat-info p {
+            color: #2c7da0;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        /* ===== CHARTS GRID ===== */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .chart-card {
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .chart-card h3 {
+            color: #1a4b6d;
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .chart-card h3 i {
+            color: #2c7da0;
+        }
+        
+        .chart-container {
+            height: 240px;
+            width: 100%;
+        }
+        
+        /* ===== ACTION BAR ===== */
+        .action-bar {
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #2c7da0;
+            font-size: 14px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 14px 16px 14px 45px;
+            background: white;
+            border: 1px solid rgba(44,125,160,0.2);
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: #2c7da0;
+            box-shadow: 0 0 0 3px rgba(44,125,160,0.1);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        
+        .btn i {
+            font-size: 14px;
+        }
+        
+        .btn-primary {
+            background: #2c7da0;
+            color: white;
+            box-shadow: 0 4px 12px rgba(44,125,160,0.2);
+        }
+        
+        .btn-primary:hover {
+            background: #1a5f7a;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(44,125,160,0.3);
+        }
+        
+        .btn-success {
+            background: #2a9d8f;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #1f7a6f;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: #e76f51;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #d45d3f;
+            transform: translateY(-2px);
+        }
+        
+        .btn-warning {
+            background: #e9c46a;
+            color: #1a4b6d;
+        }
+        
+        .btn-warning:hover {
+            background: #d9b34c;
+            transform: translateY(-2px);
+        }
+        
+        /* ===== EXTERNAL API SECTION ===== */
+        .api-section {
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .api-section i {
+            color: #2c7da0;
+            font-size: 20px;
+        }
+        
+        .api-section input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 16px;
+            border: 1px solid rgba(44,125,160,0.2);
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        
+        .api-section input:focus {
+            outline: none;
+            border-color: #2c7da0;
+        }
+        
+        .api-hint {
+            color: #2c7da0;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        /* ===== TIME INFO ===== */
+        .time-info {
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 14px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .live-badge {
+            background: #2a9d8f;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .live-badge i {
+            font-size: 8px;
+        }
+        
+        .timestamp {
+            color: #1a4b6d;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .auto-refresh {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #1a4b6d;
+            font-size: 14px;
+        }
+        
+        /* ===== TABLE ===== */
+        .table-container {
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.3);
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        
+        .companies-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1300px;
+        }
+        
+        .companies-table th {
+            text-align: left;
+            padding: 16px;
+            color: #1a4b6d;
+            font-weight: 600;
+            font-size: 13px;
+            border-bottom: 2px solid rgba(44,125,160,0.2);
+        }
+        
+        .companies-table td {
+            padding: 16px;
+            color: #1a4b6d;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(44,125,160,0.1);
+        }
+        
+        .companies-table tr:hover {
+            background: rgba(44,125,160,0.05);
+        }
+        
+        .sector-tag {
+            background: rgba(44,125,160,0.1);
+            color: #2c7da0;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .strategy-tag {
+            background: rgba(42,157,143,0.1);
+            color: #2a9d8f;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .risk-badge {
+            padding: 4px 12px;
+            border-radius: 30px;
+            color: white;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .delete-btn {
+            background: none;
+            border: 1px solid rgba(231,111,81,0.3);
+            color: #e76f51;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .delete-btn:hover {
+            background: #e76f51;
+            border-color: #e76f51;
+            color: white;
+        }
+        
+        /* ===== ML METRICS SECTION ===== */
+        .ml-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .metric-card {
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 15px;
+            border-left: 4px solid;
+            transition: transform 0.2s;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .metric-card h4 {
+            color: #1a4b6d;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            margin-bottom: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+        
+        .feature-item {
+            margin-bottom: 10px;
+        }
+        
+        .feature-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+        
+        .feature-bar {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+        }
+        
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            padding: 28px;
+            color: #1a4b6d;
+            font-size: 13px;
+            border-top: 1px solid rgba(44,125,160,0.2);
+            margin-top: 30px;
+        }
+        
+        .footer i {
+            color: #2c7da0;
+            margin: 0 4px;
+        }
+        
+        /* ===== MODALS ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 32px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+        
+        .modal-content h2 {
+            color: #1a4b6d;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            color: #1a4b6d;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid rgba(44,125,160,0.2);
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #2c7da0;
+            box-shadow: 0 0 0 3px rgba(44,125,160,0.1);
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 28px;
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1200px) {
+            .ml-metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .charts-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .ml-metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            .action-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .search-box {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>
+                <i class="fas fa-chart-line"></i>
+                AI Exit Strategy Recommender
+            </h1>
+            <p>Professional exit strategy analytics for investors</p>
+        </div>
+
+        <!-- STATS CARDS -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-building"></i></div>
+                <div class="stat-info">
+                    <h3 id="statCompanies">0</h3>
+                    <p>Total Companies</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-coins"></i></div>
+                <div class="stat-info">
+                    <h3 id="statValuation">₹0Cr</h3>
+                    <p>Total Valuation</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-percent"></i></div>
+                <div class="stat-info">
+                    <h3 id="statRoi">0%</h3>
+                    <p>Average ROI</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-shield"></i></div>
+                <div class="stat-info">
+                    <h3 id="statRisk">0</h3>
+                    <p>Average Risk</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHARTS GRID -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3><i class="fas fa-chart-pie"></i> Strategy Distribution</h3>
+                <div id="strategyChart" class="chart-container"></div>
+            </div>
+            <div class="chart-card">
+                <h3><i class="fas fa-exclamation-triangle"></i> Risk Distribution</h3>
+                <div id="riskChart" class="chart-container"></div>
+            </div>
+            <div class="chart-card">
+                <h3><i class="fas fa-trophy"></i> Top Companies</h3>
+                <div id="valuationChart" class="chart-container"></div>
+            </div>
+        </div>
+
+        <!-- ROI CHART -->
+        <div class="chart-card" style="margin-bottom: 20px;">
+            <h3><i class="fas fa-chart-scatter"></i> ROI vs Valuation Analysis</h3>
+            <div id="roiChart" style="height: 300px;"></div>
+        </div>
+
+        <!-- ACTION BAR -->
+        <div class="action-bar">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search companies or sectors...">
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="generateLiveData()">
+                    <i class="fas fa-sync-alt"></i> Generate Live
+                </button>
+                <button class="btn btn-success" onclick="showAddModal()">
+                    <i class="fas fa-plus"></i> Add Company
+                </button>
+                <button class="btn btn-success" onclick="showUploadModal()">
+                    <i class="fas fa-upload"></i> Upload CSV
+                </button>
+                <button class="btn btn-danger" onclick="deleteAllCompanies()">
+                    <i class="fas fa-trash"></i> Delete All
+                </button>
+            </div>
+        </div>
+
+        <!-- EXTERNAL API SECTION -->
+        <div class="api-section">
+            <i class="fas fa-cloud"></i>
+            <span style="font-weight: 600; color: #1a4b6d;">External API:</span>
+            <input type="text" id="tickerInput" placeholder="Enter ticker (e.g., AAPL, MSFT, TSLA)">
+            <button class="btn btn-primary" onclick="fetchYahooFinance()">
+                <i class="fas fa-download"></i> Fetch Data
+            </button>
+            <span class="api-hint">
+                <i class="fas fa-info-circle"></i> Try: AAPL, MSFT, GOOGL, AMZN, TSLA
+            </span>
+        </div>
+
+        <!-- TIME INFO -->
+        <div class="time-info">
+            <span class="live-badge">
+                <i class="fas fa-circle"></i> LIVE
+            </span>
+            <span class="timestamp">
+                <i class="far fa-clock"></i> Last updated: <span id="lastUpdated">--:--:--</span>
+            </span>
+            <label class="auto-refresh">
+                <input type="checkbox" id="autoRefresh" checked> Auto-refresh (20s)
+            </label>
+            <button class="btn btn-warning" onclick="resetCompanies()" style="margin-left: auto;">
+                <i class="fas fa-undo-alt"></i> Reset
+            </button>
+        </div>
+
+        <!-- ML MODEL INSIGHTS SECTION -->
+        <div class="chart-card" style="margin-bottom: 20px;">
+            <h3><i class="fas fa-brain" style="color: #2c7da0;"></i> Machine Learning Model Performance</h3>
+            
+            <div class="ml-metrics-grid">
+                <!-- Random Forest Card -->
+                <div class="metric-card" style="border-left-color: #2c7da0;">
+                    <h4>🌲 Random Forest</h4>
+                    <div class="metric-row">
+                        <span>Accuracy:</span>
+                        <span style="font-weight: 600; color: #2c7da0;" id="rfAccuracy">92.4%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div id="rfBar" class="progress-fill" style="width: 92%; background: #2c7da0;"></div>
+                    </div>
+                    <p style="color: #4a5568; font-size: 12px;">200 trees, handles non-linear relationships</p>
+                </div>
+                
+                <!-- Gradient Boosting Card -->
+                <div class="metric-card" style="border-left-color: #2a9d8f;">
+                    <h4>📈 Gradient Boosting</h4>
+                    <div class="metric-row">
+                        <span>Accuracy:</span>
+                        <span style="font-weight: 600; color: #2a9d8f;" id="gbAccuracy">89.7%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div id="gbBar" class="progress-fill" style="width: 90%; background: #2a9d8f;"></div>
+                    </div>
+                    <p style="color: #4a5568; font-size: 12px;">150 stages, sequential learning</p>
+                </div>
+                
+                <!-- Ensemble Card -->
+                <div class="metric-card" style="border-left-color: #e9c46a;">
+                    <h4>⚡ Ensemble (60/40)</h4>
+                    <div class="metric-row">
+                        <span>Accuracy:</span>
+                        <span style="font-weight: 600; color: #e9c46a;" id="ensembleAccuracy">94.3%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div id="ensembleBar" class="progress-fill" style="width: 94%; background: #e9c46a;"></div>
+                    </div>
+                    <p style="color: #4a5568; font-size: 12px;">60% RF + 40% GB - Best of both</p>
+                </div>
+            </div>
+            
+            <!-- Feature Importance Chart -->
+            <div style="margin-top: 25px;">
+                <h4 style="color: #1a4b6d; margin-bottom: 15px;">🔍 Feature Importance - What Drives Decisions</h4>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div class="feature-item">
+                        <div class="feature-header">
+                            <span>Valuation</span>
+                            <span style="color: #2c7da0;" id="valImportance">35%</span>
+                        </div>
+                        <div class="feature-bar">
+                            <div id="valBar" style="width: 35%; height: 100%; background: #2c7da0; border-radius: 4px;"></div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-header">
+                            <span>ROI</span>
+                            <span style="color: #2a9d8f;" id="roiImportance">30%</span>
+                        </div>
+                        <div class="feature-bar">
+                            <div id="roiBar" style="width: 30%; height: 100%; background: #2a9d8f; border-radius: 4px;"></div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-header">
+                            <span>Competition</span>
+                            <span style="color: #e9c46a;" id="compImportance">20%</span>
+                        </div>
+                        <div class="feature-bar">
+                            <div id="compBar" style="width: 20%; height: 100%; background: #e9c46a; border-radius: 4px;"></div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-header">
+                            <span>Market Share</span>
+                            <span style="color: #e76f51;" id="marketImportance">10%</span>
+                        </div>
+                        <div class="feature-bar">
+                            <div id="marketBar" style="width: 10%; height: 100%; background: #e76f51; border-radius: 4px;"></div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-header">
+                            <span>Liquidity</span>
+                            <span style="color: #9c89b8;" id="liqImportance">5%</span>
+                        </div>
+                        <div class="feature-bar">
+                            <div id="liqBar" style="width: 5%; height: 100%; background: #9c89b8; border-radius: 4px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Training Info -->
+            <div style="margin-top: 20px; background: #f8f9fa; border-radius: 10px; padding: 15px; font-size: 13px; color: #4a5568;">
+                <i class="fas fa-database"></i> Trained on 5,000 synthetic companies • 10 features • 6 exit strategies
+                <br>
+                <i class="fas fa-clock"></i> Model updated: <span id="modelTimestamp">Just now</span>
+            </div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="table-container">
+            <table class="companies-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Company</th>
+                        <th>Sector</th>
+                        <th>Valuation (₹ Cr)</th>
+                        <th>ROI (%)</th>
+                        <th>Risk</th>
+                        <th>Strategy</th>
+                        <th>Confidence</th>
+                        <th>Timeline</th>
+                        <th>Updated</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td colspan="11" style="text-align: center; padding: 40px; color: #2c7da0;">
+                            <i class="fas fa-spinner fa-spin"></i> Loading companies...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p>
+                <i class="fas fa-robot"></i> AI-Powered Analytics 
+                • <i class="fas fa-chart-line"></i> Real-time Data 
+                • <i class="fas fa-cloud"></i> External API 
+                • <i class="fas fa-brain"></i> ML Models (94% Accuracy)
+                • <i class="fas fa-shield-alt"></i> Enterprise Grade
+            </p>
+        </div>
+    </div>
+
+    <!-- ADD COMPANY MODAL -->
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <h2><i class="fas fa-plus-circle" style="color: #2a9d8f;"></i> Add Company</h2>
+            <div class="form-group">
+                <label>Company Name</label>
+                <input type="text" id="addName" placeholder="e.g., Tesla Inc.">
+            </div>
+            <div class="form-group">
+                <label>Sector</label>
+                <select id="addSector">
+                    <option value="FinTech">FinTech</option>
+                    <option value="AgriTech">AgriTech</option>
+                    <option value="HealthTech">HealthTech</option>
+                    <option value="EdTech">EdTech</option>
+                    <option value="CleanTech">CleanTech</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Automotive">Automotive</option>
+                    <option value="E-commerce">E-commerce</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Valuation (₹ Cr)</label>
+                <input type="number" id="addValuation" placeholder="1500">
+            </div>
+            <div class="form-group">
+                <label>ROI (%)</label>
+                <input type="number" id="addRoi" placeholder="45.5" step="0.1">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-success" onclick="addCompany()" style="flex: 2;">Add Company</button>
+                <button class="btn btn-danger" onclick="closeModal('addModal')" style="flex: 1;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- UPLOAD CSV MODAL -->
+    <div id="uploadModal" class="modal">
+        <div class="modal-content">
+            <h2><i class="fas fa-file-csv" style="color: #2c7da0;"></i> Upload CSV</h2>
+            <p style="color: #1a4b6d; font-size: 14px; margin-bottom: 20px;">
+                CSV must have columns: name, sector, valuation, roi
+            </p>
+            <div class="form-group">
+                <label>Select CSV File</label>
+                <input type="file" id="csvFile" accept=".csv">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" onclick="uploadCSV()" style="flex: 2;">Upload</button>
+                <button class="btn btn-danger" onclick="closeModal('uploadModal')" style="flex: 1;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== CONFIGURATION ====================
+        // const API_URL = 'http://localhost:8000';
+        const API_URL = '';
+        let companies = [];
+        let autoRefreshInterval;
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCompanies();
+            loadMLMetrics();
+            startAutoRefresh();
+            
+            document.getElementById('searchInput').addEventListener('keyup', (e) => {
+                if (e.key === 'Enter') searchCompanies();
+            });
+            
+            document.getElementById('autoRefresh').addEventListener('change', (e) => {
+                e.target.checked ? startAutoRefresh() : stopAutoRefresh();
+            });
+            
+            document.getElementById('tickerInput').addEventListener('keyup', (e) => {
+                if (e.key === 'Enter') fetchYahooFinance();
+            });
+        });
+
+        // ==================== COMPANY OPERATIONS ====================
+        async function loadCompanies() {
+            try {
+                const res = await fetch(`${API_URL}/api/companies`);
+                const data = await res.json();
+                companies = data.data;
+                updateTable();
+                updateStats();
+                updateCharts();
+                updateTimestamp(data.timestamp);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function searchCompanies() {
+            const query = document.getElementById('searchInput').value;
+            if (!query) return loadCompanies();
+            
+            try {
+                const res = await fetch(`${API_URL}/api/search?q=${encodeURIComponent(query)}`);
+                const data = await res.json();
+                companies = data.data;
+                updateTable();
+                updateStats();
+                updateCharts();
+                updateTimestamp(data.timestamp);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function generateLiveData() {
+            const btn = event.currentTarget;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+            btn.disabled = true;
+            
+            try {
+                const res = await fetch(`${API_URL}/api/generate-live-data`, { method: 'POST' });
+                const data = await res.json();
+                companies = data.data;
+                updateTable();
+                updateStats();
+                updateCharts();
+                updateTimestamp(data.timestamp);
+                loadMLMetrics(); // Refresh ML metrics
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                btn.innerHTML = '<i class="fas fa-sync-alt"></i> Generate Live';
+                btn.disabled = false;
+            }
+        }
+
+        // ==================== YAHOO FINANCE ====================
+        async function fetchYahooFinance() {
+            const ticker = document.getElementById('tickerInput').value.trim().toUpperCase();
+            if (!ticker) return alert('Please enter a ticker');
+            
+            const btn = event.currentTarget;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching...';
+            btn.disabled = true;
+            
+            try {
+                const res = await fetch(`${API_URL}/api/yahoo-finance/${ticker}`);
+                const data = await res.json();
+                
+                if (data.success) {
+                    companies.unshift(data.data);
+                    updateTable();
+                    updateStats();
+                    updateCharts();
+                    alert(`✅ Added ${data.data.name} with ML predictions`);
+                    document.getElementById('tickerInput').value = '';
+                } else {
+                    alert(`❌ ${data.error}`);
+                }
+            } catch (error) {
+                alert('❌ Failed to fetch');
+            } finally {
+                btn.innerHTML = '<i class="fas fa-download"></i> Fetch Data';
+                btn.disabled = false;
+            }
+        }
+
+        // ==================== ML METRICS ====================
+        async function loadMLMetrics() {
+            try {
+                const res = await fetch(`${API_URL}/api/ml-metrics`);
+                const data = await res.json();
+                
+                // Update accuracy numbers
+                document.getElementById('rfAccuracy').textContent = data.models[0].accuracy + '%';
+                document.getElementById('gbAccuracy').textContent = data.models[1].accuracy + '%';
+                document.getElementById('ensembleAccuracy').textContent = data.models[2].accuracy + '%';
+                
+                // Update bars
+                document.getElementById('rfBar').style.width = data.models[0].accuracy + '%';
+                document.getElementById('gbBar').style.width = data.models[1].accuracy + '%';
+                document.getElementById('ensembleBar').style.width = data.models[2].accuracy + '%';
+                
+                // Update feature importance
+                document.getElementById('valImportance').textContent = Math.round(data.feature_importance[0].importance * 100) + '%';
+                document.getElementById('roiImportance').textContent = Math.round(data.feature_importance[1].importance * 100) + '%';
+                document.getElementById('compImportance').textContent = Math.round(data.feature_importance[2].importance * 100) + '%';
+                document.getElementById('marketImportance').textContent = Math.round(data.feature_importance[3].importance * 100) + '%';
+                document.getElementById('liqImportance').textContent = Math.round(data.feature_importance[4].importance * 100) + '%';
+                
+                // Update feature bars
+                document.getElementById('valBar').style.width = (data.feature_importance[0].importance * 100) + '%';
+                document.getElementById('roiBar').style.width = (data.feature_importance[1].importance * 100) + '%';
+                document.getElementById('compBar').style.width = (data.feature_importance[2].importance * 100) + '%';
+                document.getElementById('marketBar').style.width = (data.feature_importance[3].importance * 100) + '%';
+                document.getElementById('liqBar').style.width = (data.feature_importance[4].importance * 100) + '%';
+                
+                document.getElementById('modelTimestamp').textContent = data.timestamp;
+                
+            } catch (error) {
+                console.error('Error loading ML metrics:', error);
+            }
+        }
+
+        // ==================== ADD COMPANY ====================
+        function showAddModal() {
+            document.getElementById('addModal').classList.add('active');
+        }
+
+        async function addCompany() {
+            const name = document.getElementById('addName').value;
+            const sector = document.getElementById('addSector').value;
+            const valuation = document.getElementById('addValuation').value;
+            const roi = document.getElementById('addRoi').value;
+            
+            if (!name || !valuation || !roi) {
+                return alert('Please fill all fields');
+            }
+            
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('sector', sector);
+            formData.append('valuation', valuation);
+            formData.append('roi', roi);
+            
+            try {
+                const res = await fetch(`${API_URL}/api/add-company`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    companies.unshift(data.data);
+                    updateTable();
+                    updateStats();
+                    updateCharts();
+                    alert(`✅ Added ${name} with ML predictions`);
+                    closeModal('addModal');
+                    document.getElementById('addName').value = '';
+                    document.getElementById('addValuation').value = '';
+                    document.getElementById('addRoi').value = '';
+                }
+            } catch (error) {
+                alert('❌ Failed to add');
+            }
+        }
+
+        // ==================== CSV UPLOAD ====================
+        function showUploadModal() {
+            document.getElementById('uploadModal').classList.add('active');
+        }
+
+        async function uploadCSV() {
+            const file = document.getElementById('csvFile').files[0];
+            if (!file) return alert('Please select a CSV file');
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const res = await fetch(`${API_URL}/api/upload-csv`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    companies = [...data.data, ...companies];
+                    updateTable();
+                    updateStats();
+                    updateCharts();
+                    alert(`✅ ${data.message}`);
+                    closeModal('uploadModal');
+                    document.getElementById('csvFile').value = '';
+                } else {
+                    alert(`❌ ${data.error}`);
+                }
+            } catch (error) {
+                alert('❌ Failed to upload');
+            }
+        }
+
+        // ==================== DELETE OPERATIONS ====================
+        async function deleteCompany(id) {
+            if (!confirm('Delete this company?')) return;
+            
+            try {
+                const res = await fetch(`${API_URL}/api/companies/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                
+                if (data.success) {
+                    companies = companies.filter(c => c.id !== id);
+                    updateTable();
+                    updateStats();
+                    updateCharts();
+                }
+            } catch (error) {
+                alert('❌ Failed to delete');
+            }
+        }
+
+        async function deleteAllCompanies() {
+            if (!confirm('⚠️ Delete ALL companies?')) return;
+            
+            try {
+                const res = await fetch(`${API_URL}/api/companies/delete-all`, { method: 'DELETE' });
+                const data = await res.json();
+                
+                if (data.success) {
+                    companies = data.companies;
+                    updateTable();
+                    updateStats();
+                    updateCharts();
+                    loadMLMetrics();
+                    alert(`✅ ${data.message}`);
+                }
+            } catch (error) {
+                alert('❌ Failed to delete');
+            }
+        }
+
+        async function resetCompanies() {
+            try {
+                const res = await fetch(`${API_URL}/api/reset`);
+                const data = await res.json();
+                
+                if (data.success) {
+                    companies = data.companies;
+                    updateTable();
+                    updateStats();
+                    updateCharts();
+                    loadMLMetrics();
+                    alert(`✅ ${data.message}`);
+                }
+            } catch (error) {
+                alert('❌ Failed to reset');
+            }
+        }
+
+        // ==================== UI UPDATE FUNCTIONS ====================
+        function updateTable() {
+            const tbody = document.getElementById('tableBody');
+            
+            if (!companies || companies.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 40px; color: #2c7da0;">No companies found</td></tr>';
+                return;
+            }
+            
+            let html = '';
+            companies.forEach(c => {
+                const riskColor = getRiskColor(c.risk_score);
+                html += `<tr id="row-${c.id}">
+                    <td><span style="color: #1a4b6d;">${c.id}</span></td>
+                    <td><strong style="color: #1a4b6d;">${c.name}</strong></td>
+                    <td><span class="sector-tag">${c.sector}</span></td>
+                    <td style="color: #1a4b6d;">₹${c.valuation.toLocaleString()}</td>
+                    <td style="color: #1a4b6d;">${c.roi}%</td>
+                    <td><span class="risk-badge" style="background-color: ${riskColor};">${c.risk_score}</span></td>
+                    <td><span class="strategy-tag">${c.strategy}</span></td>
+                    <td style="color: #1a4b6d;">${c.confidence}%</td>
+                    <td style="color: #1a4b6d;">${c.optimal_timing}</td>
+                    <td style="color: #2c7da0; font-size: 13px;">${c.last_updated}</td>
+                    <td>
+                        <button class="delete-btn" onclick="deleteCompany(${c.id})">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </td>
+                </tr>`;
+            });
+            
+            tbody.innerHTML = html;
+        }
+
+        function updateStats() {
+            const total = companies.length;
+            const totalVal = companies.reduce((sum, c) => sum + c.valuation, 0);
+            const avgRoi = companies.reduce((sum, c) => sum + c.roi, 0) / total || 0;
+            const avgRisk = companies.reduce((sum, c) => sum + c.risk_score, 0) / total || 0;
+            
+            document.getElementById('statCompanies').textContent = total;
+            document.getElementById('statValuation').textContent = `₹${Math.round(totalVal)}Cr`;
+            document.getElementById('statRoi').textContent = `${avgRoi.toFixed(1)}%`;
+            document.getElementById('statRisk').textContent = Math.round(avgRisk);
+        }
+
+        function updateTimestamp(time) {
+            document.getElementById('lastUpdated').textContent = time || '--:--:--';
+        }
+
+        function getRiskColor(score) {
+            if (score < 40) return '#2a9d8f';
+            if (score < 70) return '#e9c46a';
+            return '#e76f51';
+        }
+
+        function updateCharts() {
+            if (!companies || companies.length === 0) return;
+            
+            // Strategy Chart
+            const strategyCount = {};
+            companies.forEach(c => strategyCount[c.strategy] = (strategyCount[c.strategy] || 0) + 1);
+            
+            Plotly.newPlot('strategyChart', [{
+                values: Object.values(strategyCount),
+                labels: Object.keys(strategyCount),
+                type: 'pie',
+                marker: { colors: ['#2c7da0', '#2a9d8f', '#e76f51', '#e9c46a', '#1a4b6d'] },
+                textinfo: 'label+percent',
+                hole: 0.4
+            }], {
+                height: 240,
+                margin: { t: 0, b: 0, l: 0, r: 0 },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                showlegend: false,
+                font: { family: 'Inter, sans-serif', color: '#1a4b6d' }
+            }, {displayModeBar: false});
+            
+            // Risk Chart
+            let low = companies.filter(c => c.risk_score < 40).length;
+            let medium = companies.filter(c => c.risk_score >= 40 && c.risk_score < 70).length;
+            let high = companies.filter(c => c.risk_score >= 70).length;
+            
+            Plotly.newPlot('riskChart', [{
+                x: ['Low Risk', 'Medium Risk', 'High Risk'],
+                y: [low, medium, high],
+                type: 'bar',
+                marker: { color: ['#2a9d8f', '#e9c46a', '#e76f51'] }
+            }], {
+                height: 240,
+                margin: { t: 0, b: 30, l: 40, r: 10 },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                font: { family: 'Inter, sans-serif', color: '#1a4b6d' }
+            }, {displayModeBar: false});
+            
+            // Top Companies
+            const top = [...companies].sort((a,b) => b.valuation - a.valuation).slice(0,5);
+            
+            Plotly.newPlot('valuationChart', [{
+                x: top.map(c => c.valuation),
+                y: top.map(c => c.name.length > 15 ? c.name.substring(0, 12) + '...' : c.name),
+                type: 'bar',
+                orientation: 'h',
+                marker: { color: '#2c7da0' }
+            }], {
+                height: 240,
+                margin: { t: 0, b: 20, l: 100, r: 30 },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                font: { family: 'Inter, sans-serif', color: '#1a4b6d' }
+            }, {displayModeBar: false});
+            
+            // ROI Chart
+            Plotly.newPlot('roiChart', [{
+                x: companies.map(c => c.valuation),
+                y: companies.map(c => c.roi),
+                mode: 'markers',
+                type: 'scatter',
+                marker: {
+                    size: companies.map(c => c.confidence / 2),
+                    color: companies.map(c => c.risk_score),
+                    colorscale: 'RdYlGn_r',
+                    showscale: true,
+                    colorbar: { title: 'Risk', tickfont: { color: '#1a4b6d' } }
+                },
+                text: companies.map(c => `${c.name}<br>ROI: ${c.roi}%<br>Val: ₹${c.valuation}Cr`),
+                hoverinfo: 'text'
+            }], {
+                height: 300,
+                margin: { t: 0, b: 40, l: 50, r: 50 },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                xaxis: { title: 'Valuation (₹ Cr)', titlefont: { color: '#1a4b6d' } },
+                yaxis: { title: 'ROI (%)', titlefont: { color: '#1a4b6d' } },
+                font: { family: 'Inter, sans-serif', color: '#1a4b6d' }
+            }, {displayModeBar: false});
+        }
+
+        // ==================== AUTO REFRESH ====================
+        function startAutoRefresh() {
+            stopAutoRefresh();
+            autoRefreshInterval = setInterval(() => {
+                loadCompanies();
+                loadMLMetrics();
+            }, 20000);
+        }
+
+        function stopAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+            }
+        }
+
+        // ==================== MODAL UTILITIES ====================
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        // Cleanup
+        window.addEventListener('beforeunload', stopAutoRefresh);
+    </script>
+</body>
+</html>
